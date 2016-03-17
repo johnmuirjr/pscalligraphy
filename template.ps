@@ -1,0 +1,210 @@
+%!PS-Adobe-3.0
+
+% Generate an Italic Calligraphy Practice Sheet
+% Written in 2016 by 伴上段
+%
+% To the extent possible under law, the author(s) have dedicated all copyright
+% and related and neighboring rights to this software to the public domain
+% worldwide. This software is distributed without any warranty.
+%
+% You should have received a copy of the CC0 Public Domain Dedication along
+% with this software. If not, see
+% <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+% length unit conversion (to mm) functions
+/cm { 10 mul } def
+/inches { 25.4 mul } def
+
+% Params: widthMM heightMM
+/SetPaperSize {
+	/PaperHeightMM exch def
+	/PaperWidthMM exch def
+} def
+
+% Params: leftRightMarginMM topBottomMarginMM
+/SetMargins {
+	/HorizontalMarginMM exch def
+	/VerticalMarginMM exch def
+} def
+
+% common paper sizes in mm
+% ISO A, B, and C standards
+/a0 { 841 1189 } def
+/a1 { 594 841 } def
+/a2 { 420 594 } def
+/a3 { 297 420 } def
+/a4 { 210 297 } def
+/a5 { 148 210 } def
+/a6 { 105 148 } def
+/a7 { 74 105 } def
+/a8 { 52 74 } def
+/b0 { 1000 1414 } def
+/b1 { 707 1000 } def
+/b2 { 500 707 } def
+/b3 { 353 500} def
+/b4 { 250 353 } def
+/b5 { 176 250 } def
+/b6 { 125 176 } def
+/b7 { 88 125 } def
+/b8 { 62 88 } def
+/c0 { 917 1297 } def
+/c1 { 648 917 } def
+/c2 { 458 648 } def
+/c3 { 324 458 } def
+/c4 { 229 324 } def
+/c5 { 162 229 } def
+/c6 { 114 162 } def
+/c7 { 81 114 } def
+/c8 { 57 81 } def
+
+% JIS B-series
+/jisb0 { 1030 1456 } def
+/jisb1 { 728 1030 } def
+/jisb2 { 515 728 } def
+/jisb3 { 364 515 } def
+/jisb4 { 257 364 } def
+/jisb5 { 182 257 } def
+/jisb6 { 128 182 } def
+
+% common North American paper sizes
+/letter { 216 279 } def
+/legal { 216 356 } def
+/ledger { 432 279 } def
+/tabloid { 279 432 } def
+
+
+% ---------------------- Configuration -----------------------
+% Unless noted otherwise,
+% all values here must be positive or zero.
+
+% the width of the pen nib in mm
+/NibWidthMM             1.0	def
+
+% various letter dimensions expressed in pen nib widths
+/XHeightNibs            5	def
+/AscenderHeightNibs     5	def
+/DescenderHeightNibs    5	def
+/CapHeightNibs          7	def
+/LetterBoxWidthNibs     3	def
+
+% widths of horizontal lines (in mm) that form calligraphy practice lines
+/AscenderLineWidthMM    0.15	def
+/BaselineWidthMM        0.30	def
+/WaistlineWidthMM       0.15	def
+/CapLineWidthMM         0.15	def
+
+% properties of slant lines
+/SlantAngleDegrees      5	def
+/SlantLineWidthMM       0.1	def
+
+% Set the paper size and margins here.
+letter SetPaperSize
+10.16 10.16 SetMargins  % 10.16mm = 0.4 inches = 28.8 points
+
+
+
+% ---------------------- Program -----------------------
+% 1 mm = 2.83465 points
+2.83465 2.83465 scale
+
+SlantAngleDegrees 0 lt {
+    (error: slant angle must be positive or zero) = quit
+} if
+
+CapHeightNibs XHeightNibs le {
+	/PracticeLineHeightNibs
+		DescenderHeightNibs XHeightNibs AscenderHeightNibs add add
+	def
+} {
+	XHeightNibs AscenderHeightNibs add CapHeightNibs lt {
+		/PracticeLineHeightNibs
+			DescenderHeightNibs CapHeightNibs add
+		def
+	} {
+		/PracticeLineHeightNibs
+			DescenderHeightNibs XHeightNibs AscenderHeightNibs
+			add add
+		def
+	}
+	ifelse
+} ifelse
+
+/DrawAreaWidthMM PaperWidthMM HorizontalMarginMM 2 mul sub def
+/DrawAreaHeightMM PaperHeightMM VerticalMarginMM 2 mul sub def
+
+/AscenderHeightMM AscenderHeightNibs NibWidthMM mul def
+/CapHeightMM CapHeightNibs NibWidthMM mul def
+/DescenderHeightMM DescenderHeightNibs NibWidthMM mul def
+/XHeightMM XHeightNibs NibWidthMM mul def
+
+/LetterBoxWidthMM LetterBoxWidthNibs NibWidthMM mul def
+/PracticeLineHeightMM PracticeLineHeightNibs NibWidthMM mul def
+/BoxSlantXOffsetMM
+	PracticeLineHeightMM
+	SlantAngleDegrees dup sin exch cos div
+	mul
+def
+/BoxWidthMM LetterBoxWidthMM BoxSlantXOffsetMM add def
+
+/BoxesPerPracticeLine
+	DrawAreaWidthMM BoxSlantXOffsetMM sub LetterBoxWidthMM div floor
+def
+/NumPracticeLines DrawAreaHeightMM PracticeLineHeightMM div floor def
+/PracticeLineWidthMM
+	BoxesPerPracticeLine LetterBoxWidthMM mul BoxSlantXOffsetMM add
+def
+
+% Params: x y strokeWidth
+/HorizontalLine {
+	3 1 roll
+	moveto PracticeLineWidthMM 0 rlineto setlinewidth stroke
+} def
+
+% Params: bx by
+/SlantLine {
+	moveto
+	BoxSlantXOffsetMM PracticeLineHeightMM rlineto
+	SlantLineWidthMM setlinewidth
+	stroke
+} def
+
+% Params: x y
+/PrintPracticeLine {
+	2 copy          % x y x y
+
+	2 copy AscenderLineWidthMM HorizontalLine
+	DescenderHeightMM add 2 copy BaselineWidthMM HorizontalLine
+
+	[1 1] 0 setdash
+	2 copy CapHeightMM add CapLineWidthMM HorizontalLine
+	[] 0 setdash
+
+	XHeightMM add 2 copy WaistlineWidthMM HorizontalLine
+	AscenderHeightMM add AscenderLineWidthMM HorizontalLine
+
+	BoxesPerPracticeLine 0 gt {
+		0 1 BoxesPerPracticeLine {
+			3 1 roll
+			2 copy 5 -1 roll        % x y x y forIndex
+
+			LetterBoxWidthMM mul
+			3 -1 roll add exch
+			SlantLine
+		} for
+	} if
+
+	pop pop
+} def
+
+/StartX
+	DrawAreaWidthMM PracticeLineWidthMM sub 0.5 mul HorizontalMarginMM add
+def
+/StartY
+	DrawAreaHeightMM NumPracticeLines PracticeLineHeightMM mul sub 0.5 mul
+	VerticalMarginMM add
+def
+
+0 1 NumPracticeLines 1 sub {
+	PracticeLineHeightMM mul StartY add StartX exch PrintPracticeLine
+} for
+
